@@ -142,8 +142,9 @@ void retro_shutdown_hatari(void)
    environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, NULL);
 }
 
-void retro_reset(void){
-
+void retro_reset(void)
+{
+	Reset_Cold();
 }
 
 //*****************************************************************************
