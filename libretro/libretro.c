@@ -79,124 +79,23 @@ void retro_set_environment(retro_environment_t cb)
 {
    environ_cb = cb;
 
-   static struct retro_core_option_definition core_options[] =
-   {
-	   // Video
-       {
-         "hatari_video_hires",
-         "High resolution",
-         "Needs restart",
-         {
-            { "true", "enabled" },
-            { "false", "disabled" },
-            { NULL, NULL },
-         },
-         "yes"
-      },
-      {
-         "hatari_video_crop_overscan",
-         "Crop overscan",
-         "Needs restart",
-         {
-            { "false", "disabled" },
-            { "true", "enabled" },
-            { NULL, NULL },
-         },
-         "false"
-      },
-
-      { NULL, NULL, NULL, {{0}}, NULL },
-	};
-
-   // Set options or variables
-   int i = 0;
-   int j = 0;
-   unsigned version = 0;
-   if (cb(RETRO_ENVIRONMENT_GET_CORE_OPTIONS_VERSION, &version) && (version == 1))
-      cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS, core_options);
-   else
-   {
-      // Fallback for older API
-      static struct retro_variable variables[64] = { 0 };
-      i = 0;
-      while(core_options[i].key)
-      {
-         buf[i][0] = 0;
-         variables[i].key = core_options[i].key;
-         strcpy(buf[i], core_options[i].desc);
-         strcat(buf[i], "; ");
-         strcat(buf[i], core_options[i].default_value);
-         j = 0;
-         while(core_options[i].values[j].value && j < RETRO_NUM_CORE_OPTION_VALUES_MAX)
-         {
-            strcat(buf[i], "|");
-            strcat(buf[i], core_options[i].values[j].value);
-            ++j;
-         };
-         variables[i].value = buf[i];
-         ++i;
-      };
-      variables[i].key = NULL;
-      variables[i].value = NULL;
-      cb( RETRO_ENVIRONMENT_SET_VARIABLES, variables);
-   }
+   // todo - register options
 }
-
 
 static void update_variables(void)
 {
-   struct retro_variable var = {0};
+	struct retro_variable var = {0};
 
-   // Video
-   var.key = "hatari_video_hires";
-   var.value = NULL;
+	retrow = 832;//640;
+	retroh = 520;//400;
+	hatari_borders = true;
 
-   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-   {
-	   if(strcmp(var.value, "true") == 0)
-		   video_config |= HATARI_VIDEO_HIRES;
-   }
+	log_cb(RETRO_LOG_INFO, "Resolution %u x %u.\n", retrow, retroh);
 
-   var.key = "hatari_video_crop_overscan";
-   var.value = NULL;
-
-   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-   {
-	   if(strcmp(var.value, "true") == 0)
-		   video_config |= HATARI_VIDEO_CROP;
-   }
-
-   switch(video_config)
-   {
-		case HATARI_VIDEO_OV_LO:
-			retrow = 416;
-			retroh = 260;
-			hatari_borders = true;
-			break;
-		case HATARI_VIDEO_CR_LO:
-			retrow = 320;
-			retroh = 200;
-			// Strange, do not work if set to false...
-			hatari_borders = true;
-			break;
-		case HATARI_VIDEO_OV_HI:
-			retrow = 832;
-			retroh = 520;
-			hatari_borders = true;
-			break;
-		case HATARI_VIDEO_CR_HI:
-			retrow = 832;
-			retroh = 520;
-			hatari_borders = false;
-			break;
-   }
-
-   log_cb(RETRO_LOG_INFO, "Resolution %u x %u.\n", retrow, retroh);
-
-   CROP_WIDTH =retrow;
-   CROP_HEIGHT= (retroh-80);
-   VIRTUAL_WIDTH = retrow;
-   texture_init();
+	CROP_WIDTH =retrow;
+	CROP_HEIGHT= (retroh-80);
+	VIRTUAL_WIDTH = retrow;
+	texture_init();
 }
 
 static void retro_wrap_emulator()
@@ -220,13 +119,6 @@ static void retro_wrap_emulator()
 
 void Emu_init()
 {
-#ifdef RETRO_AND
-   //you can change this after in core option if device support to setup a 832x576 res
-   retrow=640;
-   retroh=480;
-   MOUSEMODE=1;
-#endif
-
    update_variables();
 
    memset(Key_Sate,0,512);
@@ -246,7 +138,6 @@ void Emu_uninit()
 
 void retro_shutdown_hatari(void)
 {
-   printf("SHUTDOWN\n");
    texture_uninit();
    environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, NULL);
 }
@@ -542,42 +433,29 @@ void retro_set_video_refresh(retro_video_refresh_t cb)
 
 void retro_run(void)
 {
-   int x;
-   unsigned width = 640;
-   unsigned height = 400;
+	int x;
 
-   bool updated = false;
+	bool updated = false;
 
-   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated)
-      update_variables();
+	if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated)
+		update_variables();
 
-   if(pauseg==0)
-   {
-      update_input();
+	update_input();
 
-      if(SND==1)
-      {
-         int16_t *p=(int16_t*)SNDBUF;
+	int16_t *p=(int16_t*)SNDBUF;
 
-         for(x = 0; x < snd_sampler; x++)
-            audio_cb(*p++,*p++);
-      }
-   }
+	for(x = 0; x < snd_sampler; x++)
+		audio_cb(*p++,*p++);
 
-   if(ConfigureParams.Screen.bAllowOverscan || SHOWKEY==1 || STATUTON==1 || pauseg==1 )
-   {
-      width  = retrow;
-      height = retroh;
-   }
-   video_cb(bmp, width, height, retrow<< 1);
+	video_cb( bmp, retrow, retroh, retrow << 1 );
 
-   co_switch(emuThread);
+	co_switch(emuThread);
 
-   if (MidiRetroInterface && MidiRetroInterface->output_enabled())
-      MidiRetroInterface->flush();
+	if (MidiRetroInterface && MidiRetroInterface->output_enabled())
+		MidiRetroInterface->flush();
 
-   if (firstpass)
-      firstpass=0;
+	if (firstpass)
+		firstpass=0;
 }
 
 #define M3U_FILE_EXT "m3u"
