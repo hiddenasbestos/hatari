@@ -22,8 +22,11 @@ int VIRTUAL_WIDTH ;
 int retrow=1024;
 int retroh=1024;
 
+extern Uint8 STRam[];
+extern Uint32 STRamEnd;
+
 extern unsigned short int bmp[1024*1024];
-extern int SND ,snd_sampler;
+extern int snd_sampler;
 extern short signed int SNDBUF[1024*2];
 extern char RPATH[512];
 extern char RETRO_DIR[512];
@@ -322,7 +325,8 @@ void retro_init(void)
       exit(0);
    }
 
-	struct retro_input_descriptor inputDescriptors[] = {
+	struct retro_input_descriptor inputDescriptors[] =
+	{
 		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A, "A" },
 		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B, "B" },
 		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X, "X" },
@@ -589,15 +593,31 @@ bool retro_unserialize(const void *data_, size_t size)
    return false;
 }
 
-void *retro_get_memory_data(unsigned id)
+void *retro_get_memory_data(unsigned type)
 {
-   (void)id;
+   switch ( type & RETRO_MEMORY_MASK )
+   {
+
+   case RETRO_MEMORY_SYSTEM_RAM:
+      return STRam;
+
+   }
+
+   // not supported
    return NULL;
 }
 
-size_t retro_get_memory_size(unsigned id)
+size_t retro_get_memory_size(unsigned type)
 {
-   (void)id;
+   switch ( type & RETRO_MEMORY_MASK )
+   {
+
+   case RETRO_MEMORY_SYSTEM_RAM:
+      return STRamEnd;
+
+   }
+
+   // not supported
    return 0;
 }
 
