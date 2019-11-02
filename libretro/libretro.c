@@ -19,7 +19,7 @@ cothread_t emuThread;
 int CROP_WIDTH;
 int CROP_HEIGHT;
 int VIRTUAL_WIDTH ;
-int retrow=1024; 
+int retrow=1024;
 int retroh=1024;
 
 extern unsigned short int bmp[1024*1024];
@@ -61,7 +61,6 @@ unsigned int video_config = 0;
 #define HATARI_VIDEO_CR_HI 	HATARI_VIDEO_HIRES|HATARI_VIDEO_CROP
 
 bool hatari_borders = true;
-char hatari_frameskips[2];
 int firstpass = 1;
 char savestate_fname[RETRO_PATH_MAX];
 
@@ -110,24 +109,8 @@ void retro_set_environment(retro_environment_t cb)
             { NULL, NULL },
          },
          "false"
-      },  
-      {
-         "hatari_frameskips",
-         "Frameskip",
-         "Needs restart",
-         {
-            { "0", "disabled" },
-            { "1", NULL },
-            { "2", NULL },
-            { "3", NULL },
-            { "4", NULL },
-            { "5", "auto (max 5)" },
-            { "10", "auto (max 10)" },
-            { NULL, NULL },
-         },
-         "0"
       },
-	  
+
       { NULL, NULL, NULL, {{0}}, NULL },
 	};
 
@@ -189,14 +172,6 @@ static void update_variables(void)
 		   video_config |= HATARI_VIDEO_CROP;
    }
 
-   var.key = "hatari_frameskips";
-   var.value = NULL;
-
-   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-   {
-	   strncpy((char*)hatari_frameskips, var.value, 2);
-   }
-
    switch(video_config)
    {
 		case HATARI_VIDEO_OV_LO:
@@ -236,7 +211,7 @@ static void retro_wrap_emulator()
 
    pauseg=-1;
 
-   environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, 0); 
+   environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, 0);
 
    // Were done here
    co_switch(mainThread);
@@ -252,8 +227,8 @@ static void retro_wrap_emulator()
 void Emu_init()
 {
 #ifdef RETRO_AND
-   //you can change this after in core option if device support to setup a 832x576 res 
-   retrow=640; 
+   //you can change this after in core option if device support to setup a 832x576 res
+   retrow=640;
    retroh=480;
    MOUSEMODE=1;
 #endif
@@ -298,13 +273,13 @@ static bool disk_set_eject_state(bool ejected)
 	if (dc)
 	{
 		dc->eject_state = ejected;
-		
+
 		if(dc->eject_state)
 			return Floppy_EjectDiskFromDrive(0);
 		else
-			return Floppy_InsertDiskIntoDrive(0);			
+			return Floppy_InsertDiskIntoDrive(0);
 	}
-	
+
 	return true;
 }
 
@@ -312,7 +287,7 @@ static bool disk_get_eject_state(void)
 {
 	if (dc)
 		return dc->eject_state;
-	
+
 	return true;
 }
 
@@ -320,7 +295,7 @@ static unsigned disk_get_image_index(void)
 {
 	if (dc)
 		return dc->index;
-	
+
 	return 0;
 }
 
@@ -333,7 +308,7 @@ static bool disk_set_image_index(unsigned index)
 		// This can mess things in the emu
 		if(index == dc->index)
 			return true;
-		
+
 		if ((index < dc->count) && (dc->files[index]))
 		{
 			dc->index = index;
@@ -342,7 +317,7 @@ static bool disk_set_image_index(unsigned index)
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -409,8 +384,8 @@ static void fallback_log(enum retro_log_level level, const char *fmt, ...)
 }
 
 void retro_init(void)
-{    	
-	struct retro_log_callback log;	
+{
+	struct retro_log_callback log;
 	const char *system_dir = NULL;
 	dc = dc_create();
 
@@ -422,24 +397,24 @@ void retro_init(void)
 
 	if (environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system_dir) && system_dir)
    {
-      // if defined, use the system directory			
-      retro_system_directory=system_dir;		
-   }		   
+      // if defined, use the system directory
+      retro_system_directory=system_dir;
+   }
 
    const char *content_dir = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_CONTENT_DIRECTORY, &content_dir) && content_dir)
    {
-      // if defined, use the system directory			
-      retro_content_directory=content_dir;		
-   }			
+      // if defined, use the system directory
+      retro_content_directory=content_dir;
+   }
 
    const char *save_dir = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY, &save_dir) && save_dir)
    {
       // If save directory is defined use it, otherwise use system directory
-      retro_save_directory = *save_dir ? save_dir : retro_system_directory;      
+      retro_save_directory = *save_dir ? save_dir : retro_system_directory;
    }
    else
    {
@@ -503,8 +478,8 @@ void retro_init(void)
 }
 
 void retro_deinit(void)
-{	 
-   Emu_uninit(); 
+{
+   Emu_uninit();
 
    if(emuThread)
    {
@@ -606,7 +581,7 @@ void retro_run(void)
 
    if (MidiRetroInterface && MidiRetroInterface->output_enabled())
       MidiRetroInterface->flush();
-  
+
    if (firstpass)
       firstpass=0;
 }
@@ -616,9 +591,9 @@ void retro_run(void)
 bool retro_load_game(const struct retro_game_info *info)
 {
    // Init
-   environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, input_descriptors);   
+   environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, input_descriptors);
    path_join(RETRO_TOS, RETRO_DIR, "tos.img");
-   
+
    // Verify if tos.img is present
    if(!file_exists(RETRO_TOS))
    {
@@ -643,7 +618,7 @@ bool retro_load_game(const struct retro_game_info *info)
 		for(unsigned i = 0; i < dc->count; i++)
 		{
 			log_cb(RETRO_LOG_INFO, "file %d: %s\n", i+1, dc->files[i]);
-		}	
+		}
 	}
 	else
 	{

@@ -21,16 +21,15 @@ void parse_cmdline( const char *argv );
 
 // Global variables
 extern bool hatari_borders;
-extern char hatari_frameskips[2];
 
 void Add_Option(const char* option)
 {
-   printf("Option : %s\n", option);
+   // log_cb( RETRO_LOG_INFO, "Option : %s\n", option );
    static int first=0;
 
    if(first==0)
    {
-      PARAMCOUNT=0;	
+      PARAMCOUNT=0;
       first++;
    }
 
@@ -42,7 +41,7 @@ int pre_main(const char *argv)
    int i;
    bool Only1Arg;
 
-   parse_cmdline(argv); 
+   parse_cmdline(argv);
 
    Only1Arg = (strcmp(ARGUV[0],"hatari") == 0) ? 0 : 1;
 
@@ -59,7 +58,7 @@ int pre_main(const char *argv)
       Add_Option("--borders");
       Add_Option(hatari_borders==true?"1":"0");
       Add_Option("--frameskips");
-      Add_Option(hatari_frameskips);
+      Add_Option("0");
       Add_Option("--disk-a");
       Add_Option(RPATH/*ARGUV[0]*/);
    }
@@ -75,7 +74,7 @@ int pre_main(const char *argv)
       printf("%2d  %s\n",i,XARGV[i]);
    }
 
-   hmain(PARAMCOUNT,( char **)xargv_cmd); 
+   hmain(PARAMCOUNT,( char **)xargv_cmd);
 
    xargv_cmd[PARAMCOUNT - 2] = NULL;
 }
@@ -86,7 +85,7 @@ void parse_cmdline(const char *argv)
 	int c,c2;
 	static char buffer[512*4];
 	enum states { DULL, IN_WORD, IN_STRING } state = DULL;
-	
+
 	strcpy(buffer,argv);
 	strcat(buffer," \0");
 
@@ -116,7 +115,7 @@ void parse_cmdline(const char *argv)
                //... do something with the word ...
                for (c2 = 0,p2 = start_of_word; p2 < p; p2++, c2++)
                   ARGUV[ARGUC][c2] = (unsigned char) *p2;
-               ARGUC++; 
+               ARGUC++;
 
                state = DULL; /* back to "not in word, not in string" state */
             }
@@ -129,12 +128,12 @@ void parse_cmdline(const char *argv)
                //... do something with the word ...
                for (c2 = 0,p2 = start_of_word; p2 <p; p2++,c2++)
                   ARGUV[ARGUC][c2] = (unsigned char) *p2;
-               ARGUC++; 
+               ARGUC++;
 
                state = DULL; /* back to "not in word, not in string" state */
             }
             continue; /* either still IN_WORD or we handled the end above */
-      }	
+      }
    }
 }
 
