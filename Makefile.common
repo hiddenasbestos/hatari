@@ -141,6 +141,7 @@ $(EMU)/ymFormat.c
 
 SOURCES_C += $(LIBRETRO_DIR)/libretro-sdk/libco/libco.c \
 $(LIBRETRO_DIR)/libretro.c \
+$(LIBRETRO_DIR)/cmdline.c \
 $(LIBRETRO_DIR)/hatari-mapper.c \
 $(LIBRETRO_DIR)/vkbd.c \
 $(LIBRETRO_DIR)/graph.c \

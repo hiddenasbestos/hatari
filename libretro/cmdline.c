@@ -1,8 +1,15 @@
 #include <ctype.h>
+#include <string.h>
+#include <stdio.h>
+#include "libretro.h"
+
+// LOG
+extern retro_log_printf_t log_cb;
 
 //Args for experimental_cmdline
 static char ARGUV[64][1024];
 static unsigned char ARGUC=0;
+extern char RPATH[512];
 
 // Args for Core
 static char XARGV[64][1024];

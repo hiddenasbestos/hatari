@@ -30,7 +30,10 @@ extern char RETRO_DIR[512];
 extern char RETRO_TOS[512];
 extern struct retro_midi_interface *MidiRetroInterface;
 
-#include "cmdline.c"
+// cmdline.c
+extern void Add_Option(const char* option);
+extern int pre_main(const char *argv);
+extern void parse_cmdline(const char *argv);
 
 extern void update_input(void);
 extern void texture_init(void);
