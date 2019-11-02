@@ -55,6 +55,8 @@ int pre_main(const char *argv)
       Add_Option("hatari");
       Add_Option("--statusbar");
       Add_Option("0");
+      Add_Option("--memsize");
+      Add_Option("1"); //mb
       Add_Option("--borders");
       Add_Option(hatari_borders==true?"1":"0");
       Add_Option("--frameskips");
