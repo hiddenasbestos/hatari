@@ -89,9 +89,18 @@ static void update_variables(void)
 {
 	struct retro_variable var = {0};
 
-	retrow = 832;//640;
-	retroh = 520;//400;
-	hatari_borders = true;
+	if ( 0 )
+	{
+		retrow = 832;
+		retroh = 520;
+		hatari_borders = true;
+	}
+	else
+	{
+		retrow = 640;
+		retroh = 400;
+		hatari_borders = false;
+	}
 
 	log_cb(RETRO_LOG_INFO, "Resolution %u x %u.\n", retrow, retroh);
 
