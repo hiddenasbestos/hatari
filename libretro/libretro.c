@@ -459,9 +459,7 @@ void retro_run(void)
 	update_input();
 
 	int16_t *p=(int16_t*)SNDBUF;
-
-	for(x = 0; x < snd_sampler; x++)
-		audio_cb(*p++,*p++);
+	audio_batch_cb( p, snd_sampler );
 
 	video_cb( bmp, retrow, retroh, retrow << 1 );
 
