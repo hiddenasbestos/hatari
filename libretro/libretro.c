@@ -427,7 +427,7 @@ void retro_get_system_av_info_ex(struct retro_system_av_info_ex *info)
 
 	// extended fields
 	info->active_x = 96;
-	info->active_y = 60;
+	info->active_y = 58;
 	info->active_width = 640;
 	info->active_height = 400;
 }
