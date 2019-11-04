@@ -934,6 +934,13 @@ enum retro_mod
                                             * A frontend must guarantee that this environment call completes in
                                             * constant time.
                                             */
+#define RETRO_ENVIRONMENT_SET_GEOMETRY_EX 1037
+                                           /* const struct retro_game_geometry_ex * --
+                                            * An extended version of RETRO_ENVIRONMENT_SET_GEOMETRY with additional
+                                            * information on active area, to allow for cropping or deprioritisation
+                                            * of border areas.
+                                            * This call replaces RETRO_ENVIRONMENT_SET_GEOMETRY.
+                                            */
 #define RETRO_ENVIRONMENT_GET_USERNAME 38
                                            /* const char **
                                             * Returns the specified username of the frontend, if specified by the user.
@@ -2464,6 +2471,17 @@ struct retro_game_geometry
                             * if desired. */
 };
 
+struct retro_game_geometry_ex
+{
+   struct retro_game_geometry geometry;
+
+   /*size of active screen area (non border)*/
+   unsigned active_x;
+   unsigned active_y;
+   unsigned active_width;
+   unsigned active_height;
+};
+
 struct retro_system_timing
 {
    double fps;             /* FPS of video content. */
@@ -2474,6 +2492,17 @@ struct retro_system_av_info
 {
    struct retro_game_geometry geometry;
    struct retro_system_timing timing;
+};
+
+struct retro_system_av_info_ex
+{
+   struct retro_system_av_info basic;
+
+   /*size of active screen area (non border)*/
+   unsigned active_x;
+   unsigned active_y;
+   unsigned active_width;
+   unsigned active_height;
 };
 
 struct retro_variable
@@ -2673,6 +2702,7 @@ RETRO_API void retro_get_system_info(struct retro_system_info *info);
  * E.g. geom.aspect_ratio might not be initialized if core doesn't
  * desire a particular aspect ratio. */
 RETRO_API void retro_get_system_av_info(struct retro_system_av_info *info);
+RETRO_API void retro_get_system_av_info_ex(struct retro_system_av_info_ex *info);
 
 /* Sets device to be used for player 'port'.
  * By default, RETRO_DEVICE_JOYPAD is assumed to be plugged into all

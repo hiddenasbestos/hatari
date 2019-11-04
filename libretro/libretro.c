@@ -89,20 +89,11 @@ static void update_variables(void)
 {
 	struct retro_variable var = {0};
 
-	if ( 0 )
-	{
-		retrow = 832;
-		retroh = 520;
-		hatari_borders = true;
-	}
-	else
-	{
-		retrow = 640;
-		retroh = 400;
-		hatari_borders = false;
-	}
+	retrow = 832;
+	retroh = 520;
+	hatari_borders = true;
 
-	log_cb(RETRO_LOG_INFO, "Resolution %u x %u.\n", retrow, retroh);
+	// log_cb(RETRO_LOG_INFO, "Resolution %u x %u.\n", retrow, retroh);
 
 	CROP_WIDTH =retrow;
 	CROP_HEIGHT= (retroh-80);
@@ -428,6 +419,17 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
 
    info->geometry = geom;
    info->timing   = timing;
+}
+
+void retro_get_system_av_info_ex(struct retro_system_av_info_ex *info)
+{
+	retro_get_system_av_info( &( info->basic ) );
+
+	// extended fields
+	info->active_x = 96;
+	info->active_y = 60;
+	info->active_width = 640;
+	info->active_height = 400;
 }
 
 void retro_set_audio_sample(retro_audio_sample_t cb)
