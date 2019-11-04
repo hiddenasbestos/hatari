@@ -387,10 +387,10 @@ void update_input(void)
 
 	MXjoy0=0;
 
-	al[0] =(input_state_cb( 0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X));///2;
+	/*al[0] =(input_state_cb( 0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X));///2;
 	al[1] =(input_state_cb( 0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y));///2;
 
-	/* Directions */
+	// Directions
 	if (al[1] <= JOYRANGE_UP_VALUE)
 		MXjoy0 |= ATARIJOY_BITMASK_UP;
 	else if (al[1] >= JOYRANGE_DOWN_VALUE)
@@ -399,7 +399,7 @@ void update_input(void)
 	if (al[0] <= JOYRANGE_LEFT_VALUE)
 		MXjoy0 |= ATARIJOY_BITMASK_LEFT;
 	else if (al[0] >= JOYRANGE_RIGHT_VALUE)
-		MXjoy0 |= ATARIJOY_BITMASK_RIGHT;
+		MXjoy0 |= ATARIJOY_BITMASK_RIGHT;*/
 
 	// D-pad
 	if ( input_state_cb( 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT ) )
