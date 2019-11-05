@@ -80,7 +80,11 @@ static struct retro_input_descriptor input_descriptors[] = {
 
 void retro_set_environment(retro_environment_t cb)
 {
-   environ_cb = cb;
+	environ_cb = cb;
+
+	// We can start with no game disk inserted.
+	bool allow_no_game = true;
+	cb( RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &allow_no_game );
 
    // todo - register options
 }
@@ -476,52 +480,60 @@ void retro_run(void)
 
 bool retro_load_game(const struct retro_game_info *info)
 {
-   // Init
-   environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, input_descriptors);
-   path_join(RETRO_TOS, RETRO_DIR, "tos.img");
+	// Init input.
+	environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, input_descriptors);
 
-   // Verify if tos.img is present
-   if(!file_exists(RETRO_TOS))
-   {
-	   log_cb(RETRO_LOG_ERROR, "TOS image '%s' not found. Content cannot be loaded\n", RETRO_TOS);
-	   return false;
-   }
-
-   const char *full_path;
-
-   (void)info;
-
-   full_path = info->path;
-
-	// If it's a m3u file
-	if(strendswith(full_path, M3U_FILE_EXT))
+	// Verify if tos.img is present
+	path_join( RETRO_TOS, RETRO_DIR, "tos.img" );
+	if ( !file_exists( RETRO_TOS ) )
 	{
-		// Parse the m3u file
-		dc_parse_m3u(dc, full_path);
+		log_cb(RETRO_LOG_ERROR, "TOS image '%s' not found. Content cannot be loaded\n", RETRO_TOS );
+		return false;
+	}
 
-		// Some debugging
-		log_cb(RETRO_LOG_INFO, "m3u file parsed, %d file(s) found\n", dc->count);
-		for(unsigned i = 0; i < dc->count; i++)
-		{
-			log_cb(RETRO_LOG_INFO, "file %d: %s\n", i+1, dc->files[i]);
-		}
+	if ( info == NULL )
+	{
+		// no content mode.
+		strcpy( RPATH, "" );
+
+		// No disk
+		dc->index = 0;
+		dc->eject_state = true;
+		strcpy( RPATH, "" );
 	}
 	else
 	{
-		// Add the file to disk control context
-		// Maybe, in a later version of retroarch, we could add disk on the fly (didn't find how to do this)
-		dc_add_file(dc, full_path);
-	}
+		const char* full_path = info->path;
 
-	// Init first disk
-	dc->index = 0;
-	dc->eject_state = false;
-	log_cb(RETRO_LOG_INFO, "Disk (%d) inserted into drive A : %s\n", dc->index+1, dc->files[dc->index]);
-	strcpy(RPATH,dc->files[0]);
+		// Is this a playlist?
+		if ( strendswith( full_path, M3U_FILE_EXT ) )
+		{
+			// Parse the m3u file
+			dc_parse_m3u(dc, full_path);
+
+			// Some debugging
+			log_cb(RETRO_LOG_INFO, "m3u file parsed, %d file(s) found\n", dc->count );
+			for(unsigned i = 0; i < dc->count; i++)
+			{
+				log_cb(RETRO_LOG_INFO, "file %d: %s\n", i+1, dc->files[i]);
+			}
+		}
+		else
+		{
+			// Add the initial disk.
+			dc_add_file(dc, full_path);
+		}
+
+		// Init first disk
+		dc->index = 0;
+		dc->eject_state = false;
+		log_cb( RETRO_LOG_INFO, "Disk(%d) inserted into drive A: %s\n", dc->index+1, dc->files[ dc->index ] );
+		strcpy( RPATH, dc->files[ dc->index ] );
+	}
 
 	co_switch(emuThread);
 
-   return true;
+	return true;
 }
 
 void retro_unload_game(void)
