@@ -352,6 +352,19 @@ void retro_init(void)
 	};
 	environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, &inputDescriptors);
 
+	static const struct retro_controller_description p1_controllers[] =
+	{
+		{ "Atari Joystick", RETRO_DEVICE_JOYPAD },
+	};
+
+	static const struct retro_controller_info ports[] =
+	{
+		{ p1_controllers, 1  }, // port 1
+		{ NULL, 0 }
+	};
+
+	environ_cb( RETRO_ENVIRONMENT_SET_CONTROLLER_INFO, (void*)ports );
+
    static struct retro_midi_interface midi_interface;
 
    if(environ_cb(RETRO_ENVIRONMENT_GET_MIDI_INTERFACE, &midi_interface))
