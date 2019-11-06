@@ -199,14 +199,14 @@ static bool disk_set_image_index(unsigned index)
 	{
 		// Same disk...
 		// This can mess things in the emu
-		if(index == dc->index)
-			return true;
+//		if(index == dc->index) // <-- fix for running in no-content mode.
+//			return true;
 
 		if ((index < dc->count) && (dc->files[index]))
 		{
 			dc->index = index;
 			Floppy_SetDiskFileName(0, dc->files[index], NULL);
-			log_cb(RETRO_LOG_INFO, "Disk (%d) inserted into drive A : %s\n", dc->index+1, dc->files[dc->index]);
+			log_cb(RETRO_LOG_INFO, "Disk(%d) into A: %s\n", dc->index+1, dc->files[dc->index]);
 			return true;
 		}
 	}
@@ -410,7 +410,7 @@ void retro_get_system_info(struct retro_system_info *info)
 #define GIT_VERSION ""
 #endif
    info->library_version  = "1.8" GIT_VERSION;
-   info->valid_extensions = "ST|MSA|ZIP|STX|DIM|IPF|M3U";
+   info->valid_extensions = "ST|STX|MSA|M3U";
    info->need_fullpath    = true;
    info->block_extract = false;
 
@@ -498,8 +498,9 @@ bool retro_load_game(const struct retro_game_info *info)
 
 		// No disk
 		dc->index = 0;
+		dc->files[0] = NULL;
+		dc->count = 0;
 		dc->eject_state = true;
-		strcpy( RPATH, "" );
 	}
 	else
 	{
@@ -527,7 +528,7 @@ bool retro_load_game(const struct retro_game_info *info)
 		// Init first disk
 		dc->index = 0;
 		dc->eject_state = false;
-		log_cb( RETRO_LOG_INFO, "Disk(%d) inserted into drive A: %s\n", dc->index+1, dc->files[ dc->index ] );
+		log_cb( RETRO_LOG_INFO, "Disk(%d) into A: %s\n", dc->index+1, dc->files[ dc->index ] );
 		strcpy( RPATH, dc->files[ dc->index ] );
 	}
 
