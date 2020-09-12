@@ -870,8 +870,10 @@ int main(int argc, char *argv[])
 	/* Logs default to stderr at start */
 	Log_Default();
 
+#ifndef __LIBRETRO__
 	/* Initialize directory strings */
 	Paths_Init(argv[0]);
+#endif
 
 	/* Init some HW components before parsing the configuration / parameters */
 	Main_Init_HW();
