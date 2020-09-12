@@ -49,6 +49,10 @@ const char Statusbar_fileid[] = "Hatari statusbar.c : " __DATE__ " " __TIME__;
 #include "vdi.h"
 #include "fdc.h"
 
+#include "libretro.h"
+extern retro_log_printf_t log_cb;
+extern retro_environment_t environ_cb;
+
 #define DEBUG 0
 #if DEBUG
 # include <execinfo.h>
@@ -210,6 +214,18 @@ void Statusbar_SetFloppyLed(drive_index_t drive, drive_led_t state)
 {
 	assert(drive == DRIVE_LED_A || drive == DRIVE_LED_B);
 	Led[drive].state = state;
+
+	if ( environ_cb )
+	{
+		if ( state == false )
+		{
+			drive = -1; /* off */
+		}
+
+		environ_cb( RETRO_ENVIRONMENT_DISK_DRIVE_LED_BLINK, &drive );
+//		log_cb( RETRO_LOG_INFO, "BLINK:%c; ", "AB"[led] );
+	}
+
 #ifdef __LIBRETRO__
 if(drive == DRIVE_LED_A)
 if(state==true)LEDA=1;

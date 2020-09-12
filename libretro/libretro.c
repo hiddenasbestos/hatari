@@ -51,7 +51,7 @@ const char *retro_content_directory;
 static retro_video_refresh_t video_cb;
 static retro_audio_sample_t audio_cb;
 static retro_audio_sample_batch_t audio_batch_cb;
-static retro_environment_t environ_cb;
+retro_environment_t environ_cb;
 static char buf[64][4096] = { 0 };
 
 unsigned int video_config = 0;
